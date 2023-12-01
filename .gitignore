@@ -5,6 +5,6 @@
 .pytest_cache
 .vscode
 __pycache__
-aicodebot.egg-info/
+*.egg-info/
 build/
 dist/
