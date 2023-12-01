@@ -22,8 +22,10 @@ jobs:
         name: Python tests
         runs-on: ubuntu-latest
         env:
+            APP_ENVIRONMENT: test
             #CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
             #OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
         timeout-minutes: 5
 
         steps:
@@ -33,8 +35,8 @@ jobs:
             - name: Setup Python
               uses: actions/setup-python@v4
               with:
-                python-version: "3.11"
-                cache: pip
+                  python-version: "3.11"
+                  cache: pip
 
             - name: Install dependencies
               run: pip install -r requirements/requirements-test.txt
