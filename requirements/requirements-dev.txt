@@ -2,7 +2,7 @@
 -r requirements.txt
 -r requirements-test.txt
 
-# Install aicodebot
+# Your AI pair programmer
 aicodebot
 
 # For committing, formatting, and dependency management
