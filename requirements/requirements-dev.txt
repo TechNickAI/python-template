@@ -2,9 +2,6 @@
 -r requirements.txt
 -r requirements-test.txt
 
-# Your AI pair programmer
-aicodebot
-
 # For committing, formatting, and dependency management
 black
 isort
@@ -13,6 +10,6 @@ pre-commit
 ruff
 
 # Optional goodies that improve the developer experience
-pytest-sugar
-better_exceptions
-pdbpp # ipython in pdb
+# pytest-sugar
+# better_exceptions
+# pdbpp # ipython in pdb
