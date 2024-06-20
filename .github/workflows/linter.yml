@@ -3,8 +3,8 @@
 # https://github.com/github/super-linter
 
 name: Super Linter
-
 on: [push, pull_request]
+permissions: read-all
 
 jobs:
   build:

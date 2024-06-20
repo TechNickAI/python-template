@@ -2,8 +2,8 @@
 
 # Build and test the code, with an optional deploy
 name: Build
-
 on: [push, pull_request]
+permissions: read-all
 
 jobs:
     pre-commit:
@@ -23,8 +23,6 @@ jobs:
         runs-on: ubuntu-latest
         env:
             APP_ENVIRONMENT: test
-            #CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-            #OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
         timeout-minutes: 5
 
@@ -43,6 +41,3 @@ jobs:
 
             - name: Run the tests with coverage
               run: pytest --cov=./ --cov-report=xml
-
-            #- name: Upload coverage reports to Codecov
-            #  uses: codecov/codecov-action@v3
