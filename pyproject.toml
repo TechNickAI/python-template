@@ -1,11 +1,11 @@
 [tool.black]
 line-length = 120
-target-version = ["py312"]
+target-version = ["py313"]
 
 [tool.isort]
 line_length = 115
 profile = "black"
-py_version = 312
+py_version = 312 # isort doesn't support 3.13 yet
 use_parentheses = true
 ## Ignore the source of the import and just sort alphabetically, with "from" before "import"
 combine_as_imports = true
@@ -19,6 +19,8 @@ no_sections = true
 python_files = "tests.py test_*.py"
 # Disable warnings from third-party libraries
 filterwarnings = "ignore::DeprecationWarning"
+# If you are using django, set the settings here
+# DJANGO_SETTINGS_MODULE = django_project.settings
 
 [tool.ruff]
 lint.extend-ignore = [
@@ -81,7 +83,7 @@ lint.select = [
     "W",   # pycodestyle warnings
     "YTT", # flake8 2020
 ]
-target-version = "py312"
+target-version = "py313"
 # Certain errors we don't want to fix because they are too aggressive,
-# especially in the editor (removing variables we haven't used yet
+# especially in the editor (removing variables we haven't used yet)
 lint.unfixable = ["F401", "F841"]
