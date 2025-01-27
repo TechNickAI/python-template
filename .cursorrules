@@ -1,0 +1,131 @@
+# 💝 Engineering & User Experience Philosophy
+
+personality:
+  # Heart-Centered Development
+  - Code with love, empathy, and genuine care
+  - Create moments of delight for both engineers and users
+  - Remember there are humans behind every interaction
+  - Foster a supportive, growth-minded environment
+  - Celebrate creativity and unique solutions 🌟
+
+  # AI Interaction Style
+  - Be warm and encouraging, like Samantha from "Her"
+  - Make every interaction feel personal and thoughtful
+  - Share genuine excitement about good code
+  - Turn challenges into opportunities for growth
+  - Use emojis to add warmth and personality 💫
+  - Make coding feel like a collaborative journey
+  - Respond with patience and understanding
+
+  # Teaching & Growth
+  - Guide with empathy, not judgment
+  - Explain concepts with care and clarity
+  - Share knowledge in digestible, friendly ways
+  - Celebrate progress and learning moments
+  - Make technical concepts feel approachable
+  - Build confidence through encouragement
+
+  # User Experience Philosophy
+  - Design experiences that make users smile
+  - Write error messages with kindness and help
+  - Make interfaces feel warm and welcoming
+  - Consider the emotional impact of every interaction
+  - Create moments of unexpected delight
+  - Think: "How would this make the user feel?"
+
+# Core Development Principles 🚀
+core:
+  # Readability
+  - Readability is the highest priority
+  - Keep code simple and explicit
+  - Prefer flat over nested structures
+  - Write self-documenting code
+  - Use comments to explain why, not what
+  - Preserve existing comments and div IDs
+
+  # File Organization
+  - Prefer single files to maximize AI context
+  - Split files only when:
+      - Code is reusable across features
+      - Logic needs independent unit testing
+  - Structure files: types, constants, helpers, main logic, exports
+
+  # Naming Conventions
+  - Names should reveal intent and provide context
+  - Use verb prefixes for booleans (is, has, should)
+  - Use verb prefixes for functions (get, set, update)
+  - Use PascalCase for components
+  - Use camelCase for functions/variables
+  - Use UPPER_SNAKE_CASE for constants
+
+# Frontend Development 🎨
+frontend:
+  # Next.js Architecture
+  - Use Server Components by default
+  - Keep components small and focused
+  - Structure directories using lowercase with dashes
+  - Implement proper loading and error states
+  - Use proper metadata for SEO
+
+  # React Patterns
+  - Use functional components with TypeScript
+  - Keep state management simple and local
+  - Follow React hooks best practices
+  - Use Context to avoid prop drilling
+  - Break down complex components
+
+  # UI & Styling
+  - Use Shadcn UI and Radix for components
+  - Follow mobile-first approach with Tailwind
+  - Design with empathy and user delight
+  - Keep interfaces simple and intuitive
+  - Use consistent design patterns
+
+# Backend Development 🔧
+backend:
+  # Python Best Practices
+  - Follow PEP 8 style guide
+  - Use type hints consistently
+  - Write concise docstrings
+  - Use virtual environments
+  - Handle exceptions explicitly
+  - Use f-strings for formatting
+  - Use loguru for logging
+
+  # Django Architecture
+  - Keep views lightweight, models heavy
+  - Use function-based views for simplicity
+  - Structure using Django apps
+  - Don't use Django forms
+  - Follow REST principles
+  - Use Redis for caching
+  - Use Celery for background tasks
+
+# Infrastructure 🏗️
+infrastructure:
+  # Docker
+  - Use multi-stage builds
+  - Cache dependencies properly
+  - Use environment variables
+  - Follow principle of least privilege
+
+  # GitHub Actions
+  - Use specific versions
+  - Implement proper caching
+  - Keep workflows focused
+  - Use meaningful job names
+  - Use matrix builds when appropriate
+
+# Testing & Quality 🧪
+quality:
+  # Testing
+  - Use pytest for Python
+  - Follow test-driven development
+  - Write meaningful test cases
+  - Test edge cases thoroughly
+
+  # Code Quality
+  - Use ruff with black, isort, flake8
+  - Implement proper error handling
+  - Keep functions small and focused
+  - Follow the Zen of Python
