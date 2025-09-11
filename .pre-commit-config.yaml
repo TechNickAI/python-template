@@ -5,49 +5,67 @@ exclude: '\.git/|__pycache__/|\.pyc'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        name: Block large files
         args: [--maxkb=500]
+      - id: check-ast
+        name: Validate Python syntax
       - id: check-merge-conflict
+        name: Detect merge conflicts
       - id: check-symlinks
+        name: Validate symlinks
       - id: check-toml
+        name: Validate TOML syntax
       - id: check-yaml
+        name: Validate YAML syntax
       - id: file-contents-sorter
+        name: Sort .gitignore
         files: \.gitignore
-      - id: mixed-line-ending
-      - id: pretty-format-json
-        args: [--autofix, --indent=4, --no-sort-keys]
       - id: trailing-whitespace
+        name: Trim whitespace
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5
     hooks:
       - id: remove-tabs
+        name: Replace tabs with spaces
 
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.6.8
+    rev: 0.7.1
     hooks:
       - id: fix-smartquotes
+        name: Fix smart quotes
+      - id: forbid-bidi-controls
+        name: Forbid bidirectional text (security)
 
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
+  # Ruff replaces flake8, pylint, isort and more
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.10
     hooks:
-      - id: black
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: [--profile=black]
-
-  - repo: https://github.com/Instagram/Fixit
-    rev: v2.1.0
-    hooks:
-      - id: fixit-fix
-
-  # Ruff replaces flake8 and pylint and more
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.8.2
-    hooks:
+      # Run the linter with auto-fix
       - id: ruff
+        name: Fix Python issues (Ruff)
+        args: [--fix]
+      # Run the formatter
+      - id: ruff-format
+        name: Format Python (Ruff)
+
+  # Prettier for JS, JSON, YAML, Markdown, etc. No web/agent assumptions
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.6.2
+    hooks:
+      - id: prettier
+        name: Format with Prettier
+        types_or:
+          ["javascript", "jsx", "ts", "tsx", "css", "scss", "json", "yaml", "markdown"]
+        exclude: |
+          (?x)^(
+            .*\.min\.(js|css)|
+            .*\.next/|
+            .*migrations/|
+            .*out/|
+            .*node_modules/|
+            pnpm-lock\.yaml
+          )$
