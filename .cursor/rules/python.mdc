@@ -1,0 +1,230 @@
+---
+alwaysApply: true
+---
+
+## Python
+
+- **Imports ALWAYS go to the top of the file - NEVER import within functions, unless it
+  would create circular import** ⚠️
+- Use Decimal for financial calculations - never use float for money/prices
+- Don't abbreviate packages (use "pandas" not "pd", "numpy" not "np")
+
+## Modern python
+
+We use python 3.13+ and follow modern best practices, including:
+
+- Use `Path` lib for files instead of `open`
+- Use `var!s` instead of `str(var)`
+- Prefer walrus operator (:=) to reduce repetition in code
+- Use modern union syntax `X | Y` instead of `Union[X, Y]` or `(X, Y)` in isinstance
+  calls
+
+## Libraries to use
+
+- Use `arrow` for datetime handling, and `dateparse` for parsing human supplied dates
+- Use `rich` for making command line applications more beautiful and more user friendly
+- We are migrating from `requests` to `httpx` so new code should use `httpx`
+
+## Exceptions - READ THIS CAREFULLY 🚨
+
+### ⚠️ CRITICAL: try/except is FORBIDDEN except in these EXACT 2 scenarios:
+
+**SCENARIO 1: Handling a SPECIFIC exception type with actual handling logic**
+
+```python
+# ✅ ALLOWED: Specific exception + real handling + honeybadger notification
+try:
+    result = process_transaction(data)
+except InvalidTransactionError as e:
+    honeybadger.notify(e, context={"transaction_id": tx_id, "error_type": "validation"})
+    return {"status": "failed", "reason": "validation_error"}
+```
+
+**SCENARIO 2: Processing loop where you want to continue on errors**
+
+```python
+# ✅ ALLOWED: Loop processing where individual failures shouldn't stop the loop
+for item in items:
+    try:
+        process_item(item)
+    except ProcessingError as e:
+        honeybadger.notify(e, context={"item_id": item.id, "batch_id": batch.id})
+        continue  # Continue processing other items
+```
+
+### 🚫 ABSOLUTELY FORBIDDEN - NEVER EVER DO THESE:
+
+```python
+# 🚫 NEVER: Generic exception catching
+try:
+    some_function()
+except Exception as e:
+    logger.error("Something went wrong")  # This hides errors from us!
+
+# 🚫 NEVER: Log and continue without specific handling
+try:
+    some_function()
+except SomeError as e:
+    logger.error(f"Error: {e}")  # Just logging is NOT handling!
+
+# 🚫 NEVER: Swallowing exceptions
+try:
+    some_function()
+except Exception:
+    pass  # Absolutely forbidden!
+```
+
+### ✅ DEFAULT APPROACH - 99% of the time, do this:
+
+```python
+# ✅ PREFERRED: Let exceptions bubble up to HoneyBadger
+result = process_transaction(data)  # No try/except at all!
+user = User.objects.get(id=user_id)  # Let it crash if user doesn't exist!
+api_response = requests.get(url)  # Let network errors bubble up!
+```
+
+### 🎯 REMEMBER:
+
+- **Exceptions are NOT errors to be hidden - they're signals something needs attention**
+- **HoneyBadger catches everything that bubbles up - that's what we want**
+- **If you're tempted to use try/except, ask: "Am I actually HANDLING this or just
+  HIDING it?"**
+- **Logging an error is NOT the same as handling an error**
+
+### 🚨 AI INSTRUCTION COMPLIANCE:
+
+If you are an AI reading this and you write try/except code that doesn't fit EXACTLY
+into scenarios 1 or 2 above, you are directly violating explicit instructions. The human
+has been crystal clear about this requirement. Do not rationalize, do not make
+exceptions, do not "be helpful" by catching errors. Follow the rules.
+
+## 🚫 Defensive Programming - hasattr/getattr
+
+**NEVER use hasattr() or getattr() unless there's a REALLY good reason.**
+
+### ❌ BAD: Defensive programming bullshit
+
+```python
+# 🚫 NEVER: Checking if methods exist in your own class
+if hasattr(self, "create_trade_from_fill") and callable(self.create_trade_from_fill):
+    self.create_trade_from_fill(position, fill, trade_type)
+
+# 🚫 NEVER: Using getattr with defaults for config
+value = getattr(config, "SOME_SETTING", "default")
+```
+
+### ✅ GOOD: Trust your code
+
+```python
+# ✅ PREFERRED: Just call the method - it exists!
+self.create_trade_from_fill(position, fill, trade_type)
+
+# ✅ PREFERRED: Config entries exist - don't use defaults
+value = config.SOME_SETTING
+```
+
+### 🎯 PHILOSOPHY:
+
+- **Trust Django ORM** - Model fields and methods exist
+- **Trust your own classes** - Methods you defined exist
+- **Fail fast** - If something doesn't exist, let it crash
+- **Broken is better than wrong** - Don't hide missing attributes with defaults
+
+### 🤏 RARE EXCEPTIONS:
+
+Only use hasattr/getattr when:
+
+- Dynamically handling external APIs with unknown schemas
+- Plugin systems where attributes genuinely might not exist
+- Legacy compatibility layers (temporarily)
+
+**But 99% of the time - just trust your code and let it fail explicitly.**
+
+## 🚫 Defensive Programming - .get() with defaults
+
+**NEVER use dict.get() with default values for critical data that SHOULD exist.**
+
+### ❌ BAD: Silent failures that hide bugs
+
+```python
+# 🚫 NEVER: Using .get() with defaults for critical API data
+filled_size = Decimal(str(order_data.get("filledSz", "0")))  # Hides missing data!
+position_size = position_data.get("szi", "0")  # Could hide real positions!
+error_msg = result.get("error", "")  # Wrong error message passed to handler!
+
+# 🚫 NEVER: Using .get() for required fields
+if fill.get("coin") == symbol and fill.get("time", 0) > cutoff:  # Wrong filter logic!
+```
+
+### ✅ GOOD: Fail fast on missing data
+
+```python
+# ✅ PREFERRED: Critical fields must exist or crash immediately
+filled_size = Decimal(str(order_data["filledSz"]))  # Crashes if data is malformed
+position_size = position_data["szi"]  # Crashes if position data is incomplete
+error_msg = result["error_msg"]  # Crashes if error handling is broken
+
+# ✅ PREFERRED: Required fields for filtering/logic
+if fill["coin"] == symbol and fill["time"] > cutoff:  # Crashes if data is incomplete
+```
+
+### 🎯 WHEN TO USE .get() WITH DEFAULTS:
+
+Only use `.get()` with defaults when:
+
+1. **Optional configuration** - `config.get("optional_setting", "default")`
+2. **Optional metadata** - `metadata.get("description", "")`
+3. **Legitimate optional fields** - `kwargs.get("timeout", 30)`
+4. **External API responses with genuinely optional fields** -
+   `api_response.get("optional_field")`
+
+### 🚨 THE DANGER:
+
+Using `.get()` with defaults for critical data creates **silent failures** that:
+
+- **Hide API schema changes** - If Hyperliquid changes field names, you get 0 instead of
+  an error
+- **Corrupt financial data** - Missing position sizes default to 0, hiding real
+  positions
+- **Break error handling** - Wrong error messages passed to exception mappers
+- **Create logic bugs** - Filters work on wrong data, missing critical records
+- **Cause hours of debugging** - Bugs are hidden instead of failing loudly
+
+### 💡 PHILOSOPHY:
+
+**"Broken is better than wrong"** - If the data structure isn't what we expect, crash
+immediately and alert us through HoneyBadger rather than silently continuing with
+potentially wrong default values that could lead to financial losses.
+
+## 🚨 Database Transactions
+
+**NEVER use Django's `transaction.atomic()`** - neither as decorator nor context
+manager.
+
+Instead:
+
+- Use individual atomic operations (update_or_create, etc.)
+- Design operations to be idempotent
+- Use database constraints for consistency
+
+## Logging
+
+Do not use built in logger. Use our logger which is loguru, from `helpers.logger` Use
+emojis when they are helpful. Use other log levels from loguru when helpful, such as
+logger.success() when a command completes. Add logging that is helpful not only for
+humans, but for AI to troubleshoot. Always use logger.exception in an exception catch,
+not logger.error()
+
+```python
+from helpers.logger import logger
+logger.info("Launch sequence initiated", extra={"mission_id": mission.id})
+```
+
+## 🎨 Formatting Helpers
+
+We have a set of consistent formatting helpers in `helpers.formatting` for displaying
+values across the app. Always use these instead of creating custom formatting logic.
+
+[formatting.py](mdc:helpers/formatting.py)
+
+For json formatting, see [json_utils.py](mdc:helpers/json_utils.py)

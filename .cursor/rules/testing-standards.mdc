@@ -1,0 +1,309 @@
+---
+description: when writing tests
+alwaysApply: false
+---
+
+# 🧪 Testing Guidelines
+
+## Core Requirements
+
+- Mock external API calls, unless the test is explicitly set to be "live", in which case
+  mark it with `@pytest.mark.flaky()`
+- Re-use fixtures from other [conftest.py](mdc:conftest.py) files, request if not
+  provided.
+- Always use pytest as testing framework. Don't import unittest under any circumstances.
+- Use pytest-mock (mocker fixture) instead of unittest.mock for mocking
+- Use monkeypatch fixture instead of unittest.mock.patch, especially for environment
+  variables
+
+## 🌐 Live Tests & Network Dependencies
+
+**Environment Variable Control:**
+
+- Use `SKIP_LIVE_TESTS=1` to skip tests that require network/external APIs
+- All live tests must include:
+  `@pytest.mark.skipif(os.environ.get("SKIP_LIVE_TESTS"), reason="Live test skipped with SKIP_LIVE_TESTS")`
+- This allows running tests offline, on planes, or in CI environments with unreliable
+  network
+
+**Live Test Guidelines:**
+
+- Keep live tests minimal (2-3 per module maximum)
+- Live tests should validate end-to-end integration, not API behavior
+- Always combine with `@pytest.mark.flaky(reruns=3, reruns_delay=1)` for reliability
+
+```python
+# ✅ CORRECT: Live test with skip capability
+@pytest.mark.django_db
+@pytest.mark.flaky(reruns=3, reruns_delay=1)
+@pytest.mark.skipif(os.environ.get("SKIP_LIVE_TESTS"), reason="Live test skipped with SKIP_LIVE_TESTS")
+def test_api_integration_live():
+    """Live test with real API - validates end-to-end flow."""
+    result = our_service.call_external_api()
+    assert result.success
+    assert result.data is not None
+
+# ✅ CORRECT: Unit test with mocked external dependency
+@pytest.mark.django_db
+def test_api_integration_mocked(mocker):
+    """Unit test - focuses on our business logic."""
+    mocker.patch("external_apis.some_api.SomeAPI.get_data", return_value=mock_response)
+    result = our_service.process_api_data()
+    assert result.calculated_value == expected_value
+```
+
+**Running Tests:**
+
+```bash
+# Run all tests including live ones
+./run_tests.py
+
+# Skip live tests (offline mode)
+SKIP_LIVE_TESTS=1 ./run_tests.py
+
+# Run only live tests
+./run_tests.py -m "not skipif"
+```
+
+## 🎯 **What to Test vs What NOT to Test**
+
+**GOLDEN RULE: Test YOUR business logic, not the libraries you depend on.**
+
+### ✅ **ALWAYS Test These**
+
+**Your Business Logic:**
+
+```python
+# ✅ Provider-specific handling logic
+def test_anthropic_uses_max_tokens_openai_uses_effort():
+    # This is OUR logic that transforms based on provider
+
+# ✅ Custom error handling and recovery
+def test_handles_none_response_gracefully():
+    # This is OUR error handling logic
+
+# ✅ Data transformations and calculations
+def test_calculates_position_pnl_correctly():
+    # This is OUR calculation logic
+
+# ✅ Workflow and state management
+def test_position_state_transitions():
+    # This is OUR state machine logic
+```
+
+**Integration Points:**
+
+```python
+# ✅ How you call external services
+def test_sends_correct_parameters_to_jupiter():
+    # Test the interface between your code and external APIs
+
+# ✅ How you handle external responses
+def test_processes_birdeye_response_correctly():
+    # Test how you transform external data into internal models
+```
+
+### 🚫 **NEVER Test These**
+
+**Library Code:**
+
+```python
+# 🚫 Don't test pydantic validation
+def test_pydantic_model_validation():
+    # Pydantic already tests this extensively
+
+# 🚫 Don't test HTTP client configuration
+def test_httpx_client_headers():
+    # This is testing httpx library behavior
+
+# 🚫 Don't test Django ORM behavior
+def test_objects_filter_works():
+    # Django already tests this
+
+# 🚫 Don't test framework internals
+def test_openai_model_processes_response():
+    # This is testing pydantic-ai internals
+```
+
+**Infrastructure Details:**
+
+```python
+# 🚫 Don't test connection setup
+def test_database_connection():
+    # This belongs in integration tests
+
+# 🚫 Don't test serialization libraries
+def test_json_dumps_works():
+    # The json library already tests this
+```
+
+### 🤔 **Ask Yourself: "Is This MY Code?"**
+
+**Decision Framework:**
+
+1. **Did I write this logic?** → ✅ Test it
+2. **Is this a library doing what it's supposed to do?** → 🚫 Don't test it
+3. **Could this break if I change MY code?** → ✅ Test it
+4. **Would this break if the library has a bug?** → 🚫 Not your responsibility to test
+5. **Is this testing HOW I use a library?** → ✅ Test it
+6. **Is this testing IF the library works?** → 🚫 Don't test it
+
+### **Quick Start - Use `mock_external_deps`**
+
+```python
+def test_trading_logic(self, mock_external_deps, mocker):
+    """Most tests should use this - mocks screenshots, prices, etc."""
+    # Screenshots and price data are already mocked!
+
+    # Just mock your specific LLM/business logic
+    mock_decision = TradingDecision(action="buy", confidence=85)
+    mocker.patch.object(runner, "run_agent", return_value=mock_decision)
+
+    result = runner.evaluate_opportunity(token)
+    assert result.action == "buy"
+```
+
+### **Granular Control - Individual Fixtures**
+
+```python
+# For tests that only need screenshot mocking
+def test_chart_logic(self, mock_screenshots):
+    chart_path = mock_screenshots  # Returns path to fake chart
+
+# For tests that only need price mocking
+def test_price_logic(self, mock_price_data):
+    price = mock_price_data  # Returns Decimal("0.005")
+
+# For comprehensive AI testing
+def test_ai_trading(self, mock_ai_responses):
+    mock_ai_responses(["buy", "sell", "hold"])  # Mock sequence
+```
+
+### **Available Fixtures**
+
+| Fixture              | What It Mocks                      | Use When                     |
+| -------------------- | ---------------------------------- | ---------------------------- |
+| `mock_external_deps` | Screenshots + prices + common APIs | **Most tests** (recommended) |
+| `mock_ai_responses`  | LLM calls + external deps          | AI/trading decision tests    |
+| `mock_screenshots`   | Chart screenshot fetching          | Tests involving charts only  |
+| `mock_price_data`    | Price API calls                    | Tests involving prices only  |
+
+## 🎭 Thoughtful Mocking - When to Mock vs When to Fix
+
+**CRITICAL PRINCIPLE: Mocking should isolate your code from external dependencies, NOT
+hide internal problems.**
+
+### ✅ **Good Mocking - External Dependencies**
+
+```python
+# ✅ GOOD: Mock external API calls
+def test_token_analysis(mock_external_deps):
+    # External APIs already mocked with realistic data
+    result = analyze_token(token)
+    assert result.price == Decimal("0.005")
+
+# ✅ GOOD: Mock time-dependent operations
+def test_position_age(mocker):
+    fixed_time = datetime(2024, 1, 1, 12, 0, 0)
+    mocker.patch("django.utils.timezone.now", return_value=fixed_time)
+    # ... rest of test
+```
+
+### 🚫 **Bad Mocking - Covering Up Problems**
+
+```python
+# 🚫 BAD: Mocking to hide address validation errors
+def test_strategy_evaluation(mocker):
+    # This hides the fact that our token has an invalid address!
+    mocker.patch("helpers.address_validation.validate_chain_address", return_value=True)
+
+# 🚫 BAD: Mocking internal logic that should work
+def test_wallet_lookup(mocker):
+    # This hides the fact that our test setup is broken!
+    mocker.patch("rocketman.strategy_runner.Wallet.objects.get", return_value=fake_wallet)
+```
+
+### 🤔 **How to Know If You're Mocking Wrong**
+
+**ASK YOURSELF:**
+
+- **Am I mocking because the test is failing?** → 🚨 RED FLAG - Fix the root cause
+  instead
+- **Am I mocking internal code that I wrote?** → 🚨 RED FLAG - The internal code should
+  work
+- **Am I mocking to avoid setting up proper test data?** → 🚨 RED FLAG - Create proper
+  fixtures
+- **Would this code work in production without the mock?** → If no, you're hiding a bug
+
+**GOOD REASONS TO MOCK:**
+
+- External API calls (BirdEye, Jupiter, etc.)
+- Time-dependent operations (timezone.now)
+- Expensive operations (database queries in unit tests)
+- Non-deterministic operations (random values)
+- Infrastructure dependencies (file system, network)
+
+### 🔧 **The Right Way to Handle Test Failures**
+
+**When a test fails, follow this decision tree:**
+
+1. **Is this an external dependency?** → Mock it
+2. **Is this invalid test data?** → Fix the test data
+3. **Is this a missing database record?** → Create proper fixtures
+4. **Is this a validation error?** → Fix the validation logic or use valid data
+5. **Is this a configuration issue?** → Fix the configuration
+
+**NEVER mock away the error - understand why it's happening and fix the root cause.**
+
+### 💡 **Examples of Proper Fixes**
+
+```python
+# ❌ Wrong: Mock away the wallet lookup error
+mocker.patch("Wallet.objects.get", return_value=fake_wallet)
+
+# ✅ Right: Create the wallet that the strategy expects
+def test_strategy_evaluation(self):
+    # Create the actual wallet with the address from the strategy config
+    wallet = Wallet.objects.create(
+        address="4ERuxQ6tiVUqv94dDcA8MXWUbQGpdL9jELQ454BCukcv",
+        chain=self.chain,
+        name="FOMO Test Wallet"
+    )
+    # Now the test uses real data that matches production
+```
+
+## 🏗️ Test Structure
+
+```python
+import pytest
+from decimal import Decimal
+
+@pytest.fixture
+def mission_control(db):
+    return MissionControl.objects.create(
+        name="Apollo",
+        thrust_power=Decimal("100.0")
+    )
+
+def test_trajectory_calculation(mission_control):
+    """Test mission trajectory calculations
+
+    Ensures proper calculation of thrust vectors
+    """
+    result = mission_control.calculate_trajectory()
+    assert result.status == "🚀 In Orbit"
+    assert result.thrust_vector == pytest.approx(Decimal("100.0"))
+```
+
+## Rules
+
+- When there is a test failure that you are examining - think first - is this a test
+  problem or a code problem? What's the right thing to fix?
+- **Never "fix" a broken test by mocking a python call that hides the error.**
+- **Be extremely thoughtful about when to use mocking - confirm it's actually the best
+  solution and not a hack.**
+- Don't overzealously test for exact text - we don't want tests failing when we change
+  text. Keep tests resilient.
+- **FOCUS ON YOUR BUSINESS LOGIC** - Test what you wrote, not what libraries do.
+- **Quality over quantity** - 10 focused tests that test your logic are better than 100
+  tests that test everything.
