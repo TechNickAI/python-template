@@ -4,7 +4,8 @@ Introduction
 
 ## Coding Principles
 
-Borrowed from the [zen of python](http://c2.com/cgi/wiki?PythonPhilosophy), with a couple of changes.
+Borrowed from the [zen of python](http://c2.com/cgi/wiki?PythonPhilosophy), with a
+couple of changes.
 
 ```text
 1. **Readability is the number 1 code quality metric**.
