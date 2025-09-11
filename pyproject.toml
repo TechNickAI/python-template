@@ -1,20 +1,3 @@
-[tool.black]
-line-length = 120
-target-version = ["py313"]
-
-[tool.isort]
-line_length = 115
-profile = "black"
-py_version = 312 # isort doesn't support 3.13 yet
-use_parentheses = true
-## Ignore the source of the import and just sort alphabetically, with "from" before "import"
-combine_as_imports = true
-combine_straight_imports = true
-from_first = true
-lines_between_sections = 0
-no_sections = true
-
-
 [tool.pytest.ini_options]
 python_files = "tests.py test_*.py"
 # Disable warnings from third-party libraries
@@ -23,6 +6,7 @@ filterwarnings = "ignore::DeprecationWarning"
 # DJANGO_SETTINGS_MODULE = django_project.settings
 
 [tool.ruff]
+exclude = ["**/migrations", "**/node_modules"]
 lint.extend-ignore = [
     "DTZ003",
     "DTZ007",
@@ -46,9 +30,8 @@ lint.extend-ignore = [
     "TRY003",  # long messages in exceptions are ok
 ]
 # https://beta.ruff.rs/docs/rules/#ruff-specific-rules-ruf
-line-length = 120
+line-length = 88
 lint.select = [
-    # Note, don't use isort through ruff, it's not as configurable as the standalone tool
     "A", # builtins
     #"ARG", # unused arguments
     "B",   # bugbear
@@ -72,7 +55,7 @@ lint.select = [
     "PTH", # Use path library
     "RET", # return statements
     "RSE", # raise statements
-    #"RUF", # ruff Disabled because it is too aggressive about removing noqa settings when editing files
+    #"RUF", # ruff
     "S",   # flake8-bandit
     "SIM", # flake8 simplify
     "SLF", # self
@@ -87,3 +70,16 @@ target-version = "py313"
 # Certain errors we don't want to fix because they are too aggressive,
 # especially in the editor (removing variables we haven't used yet)
 lint.unfixable = ["F401", "F841"]
+
+# Ruff import-sorting configuration (replaces standalone isort)
+lint.isort.combine-as-imports = true
+lint.isort.force-wrap-aliases = true
+lint.isort.from-first = true
+lint.isort.lines-between-types = 0
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["PLR0915", "ARG001", "ARG005", "SLF001", "F841"]
+"**/conftest.py" = ["ARG001"]
