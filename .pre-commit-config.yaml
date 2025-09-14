@@ -69,3 +69,9 @@ repos:
             .*node_modules/|
             pnpm-lock\.yaml
           )$
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.1
+    hooks:
+      - id: actionlint
+        name: Check Github Actions
