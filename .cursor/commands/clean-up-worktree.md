@@ -1,0 +1,1 @@
+../../.claude/commands/clean-up-worktree.md

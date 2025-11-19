@@ -24,6 +24,15 @@
             }
         },
         {
+            "files": ["*.html", "*.xml", "*.svg"],
+            "options": {
+                "tabWidth": 2,
+                "bracketSameLine": true,
+                "htmlWhitespaceSensitivity": "css",
+                "singleAttributePerLine": false
+            }
+        },
+        {
             "files": ["*.yml", "*.yaml"],
             "options": {
                 "tabWidth": 2
