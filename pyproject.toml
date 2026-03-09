@@ -83,3 +83,4 @@ docstring-code-format = true
 [tool.ruff.lint.per-file-ignores]
 "test_*.py" = ["PLR0915", "ARG001", "ARG005", "SLF001", "F841"]
 "**/conftest.py" = ["ARG001"]
+".claude/skills/*/scripts/*.py" = ["E501", "F401", "PLR0911", "T201", "TRY300"]

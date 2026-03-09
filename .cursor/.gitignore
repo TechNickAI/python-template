@@ -1,32 +1,25 @@
-# macOS
-.DS_Store
-
-# Editor/IDE
-*.swp
-*.local.json
-
-# Python (for testing/examples)
-*.pyc
-__pycache__/
-.pytest_cache/
-.venv/
-.ruff_cache/
-
-# Node.js (for testing/examples)
-node_modules/
-.pnpm-store/
-
 # Build artifacts
-bin/
-lib/
-dist/
-build/
-
+# Editor/IDE
 # Logs
-*.log
-
+# Node.js (for testing/examples)
+# Python (for testing/examples)
 # Temporary files
-*.tmp
+# macOS
+*.local.json
+*.log
+*.pyc
+*.swp
 *.temp
-
+*.tmp
+.DS_Store
 .created-prompts/
+.pnpm-store/
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+bin/
+build/
+dist/
+lib/
+node_modules/
