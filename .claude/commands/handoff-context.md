@@ -18,12 +18,12 @@ Do not ask for permission - execute immediately. </execution>
 ```markdown
 # Context Handoff
 
-<context_handoff> <original_task> [State the original, specific request or task]
-</original_task> <work_completed> [List everything successfully accomplished with file
-paths and line numbers] </work_completed> <work_remaining> [Detail work that still needs
-to be done with priorities] </work_remaining> <attempted_approaches> [Document
-approaches that didn't work and why] </attempted_approaches> <critical_context>
-[Preserve essential technical, project, and business context] </critical_context>
+<context_handoff>
+<original_task> [State the original, specific request or task] </original_task>
+<work_completed> [List everything successfully accomplished with file paths and line numbers] </work_completed>
+<work_remaining> [Detail work that still needs to be done with priorities] </work_remaining>
+<attempted_approaches> [Document approaches that didn't work and why] </attempted_approaches>
+<critical_context> [Preserve essential technical, project, and business context] </critical_context>
 <current_state> [Describe exact state of deliverables and system] </current_state>
 <recommendations> [Provide actionable next steps in priority order] </recommendations>
 </context_handoff>
@@ -46,4 +46,3 @@ For comprehensive documentation: Include file paths with line numbers, document 
 <success-criteria>
 Handoff should be immediately pasteable into new Claude conversation. New Claude instance should be able to continue work without additional context.
 </success-criteria>
-```

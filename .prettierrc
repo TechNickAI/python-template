@@ -6,7 +6,7 @@
     "arrowParens": "always",
     "proseWrap": "always",
     "htmlWhitespaceSensitivity": "css",
-    "embeddedLanguageFormatting": "auto",
+    "embeddedLanguageFormatting": "off",
     "singleAttributePerLine": false,
     "overrides": [
         {

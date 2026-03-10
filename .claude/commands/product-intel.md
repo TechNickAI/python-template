@@ -49,7 +49,9 @@ Competitor files (`/product-intel/competitors/[slug].md`):
 ```markdown
 # [Company Name]
 
-**Last Checked**: YYYY-MM-DD **Website**: [url] **Positioning**: One-sentence value prop
+**Last Checked**: YYYY-MM-DD
+**Website**: [url]
+**Positioning**: One-sentence value prop
 
 ## Overview
 
@@ -87,7 +89,8 @@ Topic files (`/product-intel/topics/[topic-slug].md`):
 ```markdown
 # [Topic Name]
 
-**Last Checked**: YYYY-MM-DD **Relevance**: Why this matters to the project
+**Last Checked**: YYYY-MM-DD
+**Relevance**: Why this matters to the project
 
 ## Recent Developments
 

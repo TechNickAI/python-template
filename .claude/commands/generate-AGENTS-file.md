@@ -32,7 +32,8 @@ Add an "Always Apply Rules" section at the top with @ references:
 
 Core project rules that apply to all tasks:
 
-@.cursor/rules/personalities/unity.mdc @.cursor/rules/git-interaction.mdc
+@.cursor/rules/personalities/unity.mdc
+@.cursor/rules/git-interaction.mdc
 @.cursor/rules/typescript-coding-standards.mdc
 ```
 
@@ -78,7 +79,8 @@ Create a structured file with these sections (omit sections with no valuable con
 
 Core project rules that apply to all tasks:
 
-@.cursor/rules/rule-one.mdc @.cursor/rules/rule-two.mdc
+@.cursor/rules/rule-one.mdc
+@.cursor/rules/rule-two.mdc
 
 ## Project Overview
 
